@@ -1,12 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import {
-  Project,
-  TypeAliasDeclaration,
-  InterfaceDeclaration,
-  PropertySignature,
-  MethodSignature,
-} from 'ts-morph';
+import { Project, SyntaxKind } from 'ts-morph';
 
 const ROOT_DIR = path.join(__dirname, '../');
 const COMP_DIR = path.join(ROOT_DIR, './components');
@@ -67,15 +61,16 @@ const props: PropsTableLine[] = [];
 const events: EventsTableLine[] = [];
 
 // type ButtonProps = { //... };
-if (propsTypeOrInterfaceDeclaration instanceof TypeAliasDeclaration) {
+if (propsTypeOrInterfaceDeclaration.isKind(SyntaxKind.TypeAliasDeclaration)) {
   const propsTypeNode = propsTypeOrInterfaceDeclaration.getTypeNodeOrThrow();
   propsTypeNode.forEachChild((c) => {
     // size?: 'sm' | 'md' | 'lg';
-    if (c instanceof PropertySignature) {
+    if (c.isKind(SyntaxKind.PropertySignature)) {
       const param = c.getName();
       const [descJsDoc] = c.getJsDocs();
-      const desc = descJsDoc.getCommentText() ?? '';
-      const type = '`' + c.getTypeNodeOrThrow().getText() + '`';
+      const desc = descJsDoc.getCommentText() ?? '-';
+      const type =
+        '`' + c.getTypeNodeOrThrow().getText().replace(/\|/g, '\\|') + '`';
       const defaultValue = '-';
       props.push({
         param,
@@ -85,7 +80,7 @@ if (propsTypeOrInterfaceDeclaration instanceof TypeAliasDeclaration) {
       });
     }
     // onClick?(): void;
-    if (c instanceof MethodSignature) {
+    if (c.isKind(SyntaxKind.MethodSignature)) {
       const event = c.getName();
       const [descJsDoc] = c.getJsDocs();
       const desc = descJsDoc.getCommentText() ?? '';
@@ -106,7 +101,7 @@ if (propsTypeOrInterfaceDeclaration instanceof TypeAliasDeclaration) {
 }
 
 // interface ButtonProps { // ... };
-if (propsTypeOrInterfaceDeclaration instanceof InterfaceDeclaration) {
+if (propsTypeOrInterfaceDeclaration.isKind(SyntaxKind.InterfaceDeclaration)) {
 }
 
 const propsTableHeader =

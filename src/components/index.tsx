@@ -1,17 +1,7 @@
-import {
-  type ButtonHTMLAttributes,
-  type FC,
-  type MouseEvent,
-  type PropsWithChildren,
-} from 'react';
+import { type FC, type MouseEvent, type PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
 type ButtonProps = {
-  /**
-   * 类型
-   * @property
-   */
-  type: ButtonHTMLAttributes<HTMLButtonElement>['type'];
   /**
    * 尺寸
    * @property
@@ -49,7 +39,6 @@ const Button: FC<PropsWithChildren<ButtonProps>> = (props) => {
 
 Button.defaultProps = {
   size: 'md',
-  disabled: false,
 };
 
 export default Button;
